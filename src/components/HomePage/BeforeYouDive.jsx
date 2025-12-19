@@ -29,11 +29,6 @@ const contentData = [
     gradient: "from-blue-400 to-indigo-500",
   },
   {
-    icon: Tent,
-    text: "Free accommodation with every ProNite pass.",
-    gradient: "from-indigo-400 to-purple-500",
-  },
-  {
     icon: Users,
     text: "Team available 24/7. Let's make Plinth safe!",
     gradient: "from-purple-400 to-pink-500",

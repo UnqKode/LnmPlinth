@@ -1,13 +1,11 @@
-
-
 import { NextResponse } from 'next/server';
 
-const GOOGLE_SCRIPT_URL = process.env.SHEETURL;
+const GOOGLE_SCRIPT_URL = process.env.SHEET2;
 export async function POST(request) {
     try {
         const data = await request.json();
 
-        console.log("📤 Proxying request to Google Sheets...", data);
+        console.log("📤 Proxying request to Google Sheets (Ambassador)...", data);
 
         // Forward the request to Google Apps Script
         const response = await fetch(GOOGLE_SCRIPT_URL, {
@@ -15,7 +13,6 @@ export async function POST(request) {
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify(data),
         });
-
 
         const responseText = await response.text();
         console.log("📥 Response from Google Sheets:", responseText);

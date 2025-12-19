@@ -4,7 +4,7 @@ import React, { useEffect, useState } from "react"
 import { cn } from "../../lib/utils"
 
 export const Meteors = ({
-  number = 100,
+  number = 50,
   minDelay = 0,
   maxDelay = 1.2,
   minDuration = 2,

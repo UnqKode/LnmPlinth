@@ -22,7 +22,8 @@ import {
   User,
   Trophy,
   Download,
-  Zap
+  Zap,
+  ChevronDown
 } from "lucide-react";
 import { Particles } from "../../../components/ui/particles";
 import { Meteors } from "../../../components/ui/meteors";
@@ -32,6 +33,41 @@ const orbitron = Orbitron({
   weight: ["400", "600", "700", "800"],
   display: "swap",
 });
+
+const EVENTS_DATA = [
+  { id: "nitro_racing", name: "Nitro Racing", price: 199, club: "PHEONIX" },
+  { id: "robocup", name: "Robocup", price: 199, club: "PHEONIX" },
+  { id: "roborace", name: "Roborace", price: 199, club: "PHEONIX" },
+  { id: "moto_boat", name: "Moto Boat", price: 199, club: "PHEONIX" },
+  { id: "robo_transporter", name: "Robo Transporter", price: 199, club: "PHEONIX" },
+  { id: "rc_plane", name: "RC Plane", price: 199, club: "PHEONIX" },
+  { id: "drone_racing", name: "Drone Racing", price: 199, club: "PHOENIX" },
+  { id: "micro_mouse", name: "Micro Mouse", price: 199, club: "PHEONIX" },
+  { id: "maze_solver", name: "Maze Solver", price: 199, club: "PHEONIX" },
+  { id: "tech_expo", name: "Tech Expo", price: 199, club: "PHEONIX" },
+  { id: "robowars", name: "Robowars", price: 199, club: "PHEONIX" },
+  { id: "alice_bob", name: "Alice, Bob, Go!", price: 199, club: "CYBROS" },
+  { id: "coding_cascade", name: "Coding Cascade", price: 199, club: "CYBROS" },
+  { id: "cp_duels", name: "CP Duels", price: 199, club: "CYBROS" },
+  { id: "enigma", name: "Enigma", price: 199, club: "CYBROS" },
+  { id: "iudp", name: "IUPC", price: 199, club: "CYBROS" },
+  { id: "astromemia", name: "Astromemia", price: 199, club: "ASTRO" },
+  { id: "starpix", name: "StarPix", price: 199, club: "ASTRO" },
+  { id: "bhahmaand", name: "Bhahmaand", price: 199, club: "ASTRO" },
+  { id: "sharktank", name: "SharkTank", price: 199, club: "E-CELL" },
+  { id: "ideathon", name: "Ideathon", price: 199, club: "E-CELL" },
+  { id: "clash_royals", name: "Clash Royals", price: 199, club: "ESPORTS" },
+  { id: "fifa", name: "FIFA", price: 199, club: "ESPORTS" },
+  { id: "smashkarts", name: "SmashKarts", price: 199, club: "ESPORTS" },
+  { id: "bgmi", name: "BGMI", price: 199, club: "ESPORTS" },
+  { id: "valorant", name: "Valorant", price: 199, club: "ESPORTS" },
+  { id: "ipl_auction", name: "IPL Auction", price: 199, club: "QUIZZINGA" },
+  { id: "cryptex", name: "Cryptex", price: 199, club: "QUIZZINGA" },
+  { id: "brand_wagon", name: "Brand Wagon", price: 199, club: "QUIZZINGA" },
+  { id: "mun", name: "MUN", price: 199, club: "DEBATE SOCIETY" },
+  { id: "change_my_mind", name: "CHANGE MY MIND", price: 199, club: "DEBATE SOCIETY" },
+  { id: "graffiti_wall", name: "GRAFFITI WALL", price: 199, club: "DEBATE SOCIETY" },
+];
 
 export default function Page() {
   const router = useRouter();
@@ -46,8 +82,13 @@ export default function Page() {
   const [comments, setComments] = useState("");
   const [needsAccommodation, setNeedsAccommodation] = useState(false);
   const [loading, setLoading] = useState(false);
-  const [codes] = useState([]);
   const [activeStep, setActiveStep] = useState(1);
+  const [showEventDropdown, setShowEventDropdown] = useState(false);
+
+  const filteredEvents = EVENTS_DATA.filter(event => 
+    event.name.toLowerCase().includes(eventInput.toLowerCase()) && 
+    !selectedEvents.find(e => e.id === event.id)
+  );
 
   const addMember = () => {
     setMembers([...members, { name: "", college: "", contact: "", email: "" }]);
@@ -68,37 +109,25 @@ export default function Page() {
   const handleEventInputKeyPress = (e) => {
     if (e.key === 'Enter') {
       e.preventDefault();
-      addEvent();
+      if (filteredEvents.length > 0) {
+        selectEvent(filteredEvents[0]);
+      }
     }
   };
 
-  const addEvent = () => {
-    const trimmedEvent = eventInput.trim();
-    if (trimmedEvent && !selectedEvents.includes(trimmedEvent)) {
-      setSelectedEvents([...selectedEvents, trimmedEvent]);
-      setEventInput("");
-      toast.success(`🎯 Event "${trimmedEvent}" added!`);
-    } else if (selectedEvents.includes(trimmedEvent)) {
-      toast.error("This event is already added!");
-    }
+  const selectEvent = (event) => {
+    setSelectedEvents([...selectedEvents, event]);
+    setEventInput("");
+    setShowEventDropdown(false);
+    toast.success(`🎯 Event "${event.name}" added!`);
   };
 
-  const removeEvent = (eventToRemove) => {
-    setSelectedEvents(selectedEvents.filter(event => event !== eventToRemove));
+  const removeEvent = (eventId) => {
+    setSelectedEvents(selectedEvents.filter(event => event.id !== eventId));
     toast.success("Event removed!");
   };
 
-  const downloadBrochure = () => {
-    // Replace this URL with your actual brochure URL
-    const brochureUrl = "/brochure.pdf"; // Update with actual path
-    const link = document.createElement('a');
-    link.href = brochureUrl;
-    link.download = 'Plinth_2026_Event_Brochure.pdf';
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-    toast.success("📥 Downloading brochure...");
-  };
+
 
   const validatedFinalData = (data) => {
     if (!data.day) {
@@ -149,7 +178,7 @@ export default function Page() {
       day,
       members,
       teamSize: members.length.toString(),
-      selectedEvents,
+      selectedEvents: selectedEvents.map(e => e.name), // Mapping back to names for compatibility if backend expects strings
       referral,
       comments,
       needsAccommodation: day === "All" ? false : needsAccommodation,
@@ -165,7 +194,6 @@ export default function Page() {
     await new Promise(resolve => setTimeout(resolve, 1000));
     
     setFormData(finalData);
-
     
     toast.success("🚀 Registration successful! Launching to confirmation...");
     router.push("/confirmRegistration");
@@ -421,34 +449,62 @@ export default function Page() {
                           type="button"
                           whileHover={{ scale: 1.05 }}
                           whileTap={{ scale: 0.95 }}
-                          onClick={downloadBrochure}
-                          className="flex items-center gap-2 px-4 py-2 rounded-xl bg-gradient-to-r from-emerald-500/20 to-green-500/10 border border-emerald-500/30 text-emerald-400 hover:bg-emerald-500/30 transition-all duration-300"
+                          onClick={() => window.open("https://drive.google.com/file/d/18FIZ_ufcTzseg5CfzYNeRziV590GhmOU/view?usp=drive_link", "_blank")}
+                          className="flex items-center gap-2 px-4 py-2 rounded-xl bg-gradient-to-r from-pink-500/20 to-pink-500/10 border border-pink-500/30 text-pink-400 hover:bg-pink-500/30 transition-all duration-300"
                         >
-                          <Download className="w-4 h-4" />
-                          <span className="text-sm font-medium">Download Brochure</span>
+                          <span className="text-sm font-medium">View Brochure</span>
                         </motion.button>
                       </div>
 
                       <div className="space-y-3">
-                        <div className="flex gap-2">
-                          <input
-                            type="text"
-                            value={eventInput}
-                            onChange={(e) => setEventInput(e.target.value)}
-                            onKeyPress={handleEventInputKeyPress}
-                            placeholder="Type event name and press Enter..."
-                            className="flex-1 bg-black/50 border border-gray-700 rounded-xl px-4 py-3 text-white placeholder-gray-600 focus:border-purple-500 focus:outline-none transition-colors"
-                          />
-                          <motion.button
-                            type="button"
-                            whileHover={{ scale: 1.05 }}
-                            whileTap={{ scale: 0.95 }}
-                            onClick={addEvent}
-                            className="px-6 py-3 rounded-xl bg-gradient-to-r from-purple-500 to-pink-500 text-white font-medium hover:from-purple-600 hover:to-pink-600 transition-all duration-300 flex items-center gap-2"
-                          >
-                            <Plus className="w-4 h-4" />
-                            Add
-                          </motion.button>
+                        {/* Event Input with Autocomplete */}
+                        <div className="relative">
+                          <div className="flex gap-2">
+                            <div className="flex-1 relative">
+                              <input
+                                type="text"
+                                value={eventInput}
+                                onChange={(e) => setEventInput(e.target.value)}
+                                onKeyDown={handleEventInputKeyPress}
+                                onFocus={() => setShowEventDropdown(true)}
+                                onBlur={() => setTimeout(() => setShowEventDropdown(false), 200)}
+                                placeholder="Search and add events..."
+                                className="w-full bg-black/50 border border-gray-700 rounded-xl px-4 py-3 pr-10 text-white placeholder-gray-600 focus:border-purple-500 focus:outline-none transition-colors"
+                              />
+                              <ChevronDown className={`absolute right-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-500 transition-transform ${showEventDropdown ? 'rotate-180' : ''}`} />
+                            </div>
+                          </div>
+
+                          {/* Autocomplete Dropdown */}
+                          <AnimatePresence>
+                            {showEventDropdown && filteredEvents.length > 0 && (
+                              <motion.div
+                                initial={{ opacity: 0, y: -10 }}
+                                animate={{ opacity: 1, y: 0 }}
+                                exit={{ opacity: 0, y: -10 }}
+                                className="absolute z-50 w-full mt-2 max-h-60 overflow-y-auto bg-gray-900 border border-purple-500/30 rounded-xl shadow-2xl"
+                              >
+                                {filteredEvents.map((event, index) => (
+                                  <motion.button
+                                    key={event.id}
+                                    type="button"
+                                    initial={{ opacity: 0, x: -20 }}
+                                    animate={{ opacity: 1, x: 0 }}
+                                    transition={{ delay: index * 0.05 }}
+                                    onClick={() => selectEvent(event)}
+                                    className="w-full px-4 py-3 text-left hover:bg-purple-500/20 border-b border-gray-800 last:border-0 transition-colors group flex items-center justify-between"
+                                  >
+                                    <div>
+                                      <div className="text-white group-hover:text-purple-300 transition-colors font-medium">
+                                        {event.name}
+                                      </div>
+                                      <div className="text-xs text-gray-500">{event.club}</div>
+                                    </div>
+                                  </motion.button>
+                                ))}
+                              </motion.div>
+                            )}
+                          </AnimatePresence>
                         </div>
 
                         {/* Selected Events Display */}
@@ -457,7 +513,7 @@ export default function Page() {
                             <AnimatePresence>
                               {selectedEvents.map((event, index) => (
                                 <motion.div
-                                  key={event}
+                                  key={event.id}
                                   initial={{ opacity: 0, scale: 0.8 }}
                                   animate={{ opacity: 1, scale: 1 }}
                                   exit={{ opacity: 0, scale: 0.8 }}
@@ -465,10 +521,13 @@ export default function Page() {
                                   className="group flex items-center gap-2 px-4 py-2 rounded-lg bg-gradient-to-r from-purple-500/20 to-pink-500/20 border border-purple-500/30 text-white"
                                 >
                                   <Zap className="w-3 h-3 text-purple-400" />
-                                  <span className="text-sm font-medium">{event}</span>
+                                  <span className="text-sm font-medium">{event.name}</span>
+                                  {index === 0 && (
+                                    <span className="text-xs bg-emerald-500/20 text-emerald-400 px-2 py-0.5 rounded-full">FREE</span>
+                                  )}
                                   <button
                                     type="button"
-                                    onClick={() => removeEvent(event)}
+                                    onClick={() => removeEvent(event.id)}
                                     className="ml-1 w-5 h-5 rounded-full bg-red-500/20 hover:bg-red-500/40 border border-red-500/30 flex items-center justify-center text-red-400 transition-all duration-200"
                                   >
                                     <X className="w-3 h-3" />
@@ -481,7 +540,7 @@ export default function Page() {
 
                         <p className="text-xs text-gray-500 flex items-center gap-2">
                           <Sparkles className="w-3 h-3" />
-                          Press Enter or click Add to include events
+                          First event is free! Additional events are priced 
                         </p>
                       </div>
                     </motion.div>

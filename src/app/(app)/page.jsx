@@ -9,6 +9,8 @@ import { Orbitron } from "next/font/google";
 import { Phone, Users, FileText, Star, Clock, Home, Shield, Ticket } from "lucide-react";
 import BeforYouDive from "../../components/HomePage/BeforeYouDive";
 import HomeLast from "../../components/HomePage/HomeLast";
+import HeroAdditions from "../../components/HomePage/first";
+
 
 const orbitron = Orbitron({
   subsets: ["latin"],
@@ -169,6 +171,7 @@ export default function Page() {
             custom={0.5}
             className="mt-12"
           >
+            <HeroAdditions />
             <RegisterButton />
           </motion.div>
         </motion.section>
